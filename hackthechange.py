@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import tkinter as kt
 from PIL import Image
 
 ctk.set_appearance_mode("dark")
@@ -6,7 +7,7 @@ ctk.set_default_color_theme("dark-blue")
 
 class FacialFrame(ctk.CTkScrollableFrame):
     def __init__(self, master):
-        super().__init__(master, fg_color="springgreen3", corner_radius= 10, height=560)        
+        super().__init__(master, fg_color="springgreen3", corner_radius=10, height=560)        
         
         # Facial frame
         self.grid_columnconfigure(0, weight=1)
@@ -24,8 +25,8 @@ class FacialFrame(ctk.CTkScrollableFrame):
 
 
         # Context for memory
-        self.memory_info = ctk.CTkLabel(self, text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-                                         fg_color="navy", corner_radius=6, wraplength=410, font=('Arial', 15))
+        self.memory_info = kt.Label(self, text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+                                         wraplength=750, font=('Arial', 18))
         self.memory_info.grid(row=2, column=0, padx=10, pady=5, sticky="ew", columnspan = 2)
 
 
@@ -50,6 +51,7 @@ class FacialFrame(ctk.CTkScrollableFrame):
         else:
             self.grid_forget()
             self.exit = False
+        
 
 
 class App(ctk.CTk):
@@ -71,11 +73,8 @@ class App(ctk.CTk):
         self.background_label = ctk.CTkLabel(self, text="", image= self.background_image)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-
         # Facial recognition alert frame
         self.facial_recog_frame = FacialFrame(self)
-        self.facial_recog_frame.grid(row=1, column=0, padx=10, pady=(20,10), sticky="nsew")
-        
 
         # Edit information button
         edit_icon = Image.open("Photos\EditInfoIcon.png")
@@ -87,11 +86,29 @@ class App(ctk.CTk):
             height=100, width=100, corner_radius=10, hover_color="yellow2")
         self.edit_info_bttn.place(x=333, y=686)
 
+        # Start checking for face
+        self.read_from_file()
 
         # Background context text
         self.background_context = ctk.CTkLabel(self, text="Background is a picture of [EVENT] on [DATE] with [NAME(S)]",
                 wraplength=420, fg_color= "RoyalBlue4", font=('Arial', 15))
         self.background_context.grid(row=0, column=0, columnspan=2, sticky="we", padx=10, pady=(10,0))
+
+    # FIX THIS
+    def read_from_file(self):
+        # Function to read from a .txt file and update the label
+        try:
+            with open("memory.txt", "r") as file:
+                content = file.read()
+
+                if content == "adi" and self.facial_recog_frame.winfo_ismapped() == False:
+                    print("Person Alert!")
+                    self.facial_recog_frame = FacialFrame(self)
+                    self.facial_recog_frame.grid(row=1, column=0, padx=10, pady=(20,10), sticky="nsew")
+        except FileNotFoundError:
+            print("File not found")
+
+        self.after(2000, self.read_from_file)
 
 app = App()
 app.mainloop()
