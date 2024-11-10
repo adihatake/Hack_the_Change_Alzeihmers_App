@@ -27,7 +27,7 @@ class FacialFrame(ctk.CTkScrollableFrame):
 
         # Context for memory
         self.memory_info = kt.Label(self, text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-                                         wraplength=750, font=('Arial', 18))
+                                         wraplength=750, font=('Comic Sans', 20))
         self.memory_info.grid(row=2, column=0, padx=10, pady=5, sticky="ew", columnspan = 2)
 
 
