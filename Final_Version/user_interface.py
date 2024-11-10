@@ -6,13 +6,40 @@ from PIL import Image
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
+
+def check_face(frame):
+    global face_matches
+    
+    # for each person and their respective reference images
+    for person_present, reference_image in face_images.items():
+        person_present = person_present.replace(".jpg", "")
+        try:   
+            if DeepFace.verify(frame, reference_image.copy())['verified']:
+                if person_present not in face_matches:
+                    face_matches.append(person_present)
+                    with open('memory.txt', 'w') as file:
+                        file.write(person_present)
+            else:
+                pass
+        
+        except ValueError:
+            try:
+                face_matches.clear()
+                with open('memory.txt', 'w') as file:
+                        file.write("") 
+            except:
+                pass
+            
+            
+
+
+
 class FacialFrame(ctk.CTkScrollableFrame):
     def __init__(self, master):
         super().__init__(master, fg_color="springgreen3", corner_radius=10, height=560)        
         
         # Facial frame
         self.grid_columnconfigure(0, weight=1)
-        self.exit = False
 
 
         # Displaying memory photo
@@ -27,7 +54,7 @@ class FacialFrame(ctk.CTkScrollableFrame):
 
         # Context for memory
         self.memory_info = kt.Label(self, text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-                                         wraplength=750, font=('Comic Sans', 20))
+                                         wraplength=350, font=('Comic Sans', 14))
         self.memory_info.grid(row=2, column=0, padx=10, pady=5, sticky="ew", columnspan = 2)
 
 
@@ -39,21 +66,12 @@ class FacialFrame(ctk.CTkScrollableFrame):
 
         # Exit Button
         self.exit_bttn = ctk.CTkButton(self, text="X", fg_color="Black", corner_radius=8, 
-                                       font=('Arial', 10), text_color="White", command= self.ExitFacialFrame, width=30, 
+                                       font=('Arial', 10), text_color="White", command= master.ExitFacialFrame, width=30, 
                                        hover_color="Red")
         self.exit_bttn.grid(row=0, column=1, padx=10, pady=10, sticky= "e")
-
-
-    # Close facial recognition alert
-    def ExitFacialFrame(self):
-        if self.exit == False:
-            self.exit_bttn._fg_color = "Red"
-            self.exit = True
-        else:
-            self.grid_forget()
-            self.exit = False
-        
-
+    
+# For read_from_file()    
+iterator = 0
 
 class App(ctk.CTk):
     def __init__(self):
@@ -63,6 +81,8 @@ class App(ctk.CTk):
         self.title("MemoryHub")
         self.geometry("453x806")
         self.grid_columnconfigure(0, weight=1)
+        
+        self.exit = False
 
 
         # Background image
@@ -95,20 +115,36 @@ class App(ctk.CTk):
                 wraplength=420, fg_color= "RoyalBlue4", font=('Arial', 15))
         self.background_context.grid(row=0, column=0, columnspan=2, sticky="we", padx=10, pady=(10,0))
 
+    # Close facial recognition alert
+    def ExitFacialFrame(self):
+        if self.exit == False:
+            self.facial_recog_frame.exit_bttn._fg_color = "Red"
+            self.exit = True
+        else:
+            # Hide alert
+            self.facial_recog_frame.grid_forget()
+            self.exit = False
+
     # FIX THIS
     def read_from_file(self):
+        global iterator
+        
         # Function to read from a .txt file and update the label
         try:
             with open("memory.txt", "r") as file:
                 content = file.read()
                 print(f"This is the content: {content}")
                 
-                print(self.facial_recog_frame.winfo_ismapped())
+                #print(self.facial_recog_frame.winfo_ismapped())
 
-                if content == "adi" and self.facial_recog_frame.winfo_ismapped() == 1:
+                if content == "adi" or content == "phu" and self.facial_recog_frame.winfo_ismapped() == True and iterator == 0:
                     print("Person Alert!")
-                    self.facial_recog_frame = FacialFrame(self)
                     self.facial_recog_frame.grid(row=1, column=0, padx=10, pady=(20,10), sticky="nsew")
+                    iterator += 1
+                elif content == "adi" or content == "phu" and self.facial_recog_frame.winfo_ismapped() == False and iterator != 0:
+                    print("Person Alert!")
+                    self.facial_recog_frame.grid(row=1, column=0, padx=10, pady=(20,10), sticky="nsew")
+                    iterator == 0
                     
                 
         except FileNotFoundError:
