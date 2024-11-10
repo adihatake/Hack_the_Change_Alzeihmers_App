@@ -104,6 +104,8 @@ class App(ctk.CTk):
             height=100, width=100, corner_radius=10, hover_color="yellow2")
         self.edit_info_bttn.place(x=333, y=686)
 
+        self.facial_recog_frame.read_from_file()
+
         # Background context text
         self.background_context = ctk.CTkLabel(self, text="Background is a picture of [EVENT] on [DATE] with [NAME(S)]",
                 wraplength=420, fg_color= "RoyalBlue4", font=('Arial', 15))
